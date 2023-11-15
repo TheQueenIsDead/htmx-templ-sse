@@ -44,12 +44,14 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/random"
 	"golang.org/x/net/websocket"
 	"net/http"
+	"syscall"
 	"time"
 )
 
@@ -61,21 +63,30 @@ func hello(c echo.Context) error {
 
 			// Write
 			randomString := random.String(10)
-			err := websocket.Message.Send(ws, fmt.Sprintf("<div id=\"notifications\"> %s! </div>", randomString))
+			err := websocket.Message.Send(ws, fmt.Sprintf("<div id=\"notifications\" hx-swap-oob=\"afterend\" > %s! </div>", randomString))
 			if err != nil {
+				if errors.Is(err, syscall.EPIPE) {
+					c.Logger().Error("connection broken")
+					return
+				}
 				c.Logger().Error(err)
-				break
+				//panic(err)
 			}
 
-			// Read
-			msg := ""
-			err = websocket.Message.Receive(ws, &msg)
-			if err != nil {
-				c.Logger().Error(err)
-				break
-			}
+			//// Read
+			//msg := ""
+			//err = websocket.Message.Receive(ws, &msg)
+			//if err != nil {
+			//	if errors.Is(err, io.EOF) {
+			//		log.Debug("No data to read")
+			//	} else if errors.Is(err, syscall.EPIPE) {
+			//		log.Debug("broken pipe")
+			//	}
+			//	c.Logger().Error(err)
+			//	//panic(err)
+			//}
 
-			fmt.Printf("%s\n", msg)
+			//fmt.Printf("%s\n", msg)
 			time.Sleep(1 * time.Second)
 		}
 	}).ServeHTTP(c.Response(), c.Request())
