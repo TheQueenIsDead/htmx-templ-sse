@@ -1,12 +1,16 @@
 package main
 
+//go:generate templ generate templates
+
 import (
+	"bytes"
 	"errors"
-	"fmt"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/random"
 	"golang.org/x/net/websocket"
+	"htmx-temple-wss/templates"
+	"io"
 	"net/http"
 	"syscall"
 	"time"
@@ -25,9 +29,16 @@ func hello(c echo.Context) error {
 			// Return a list item wrapped in a list in order to mitigate interesting parsing behaviour when using OOB fragments
 			// https://github.com/bigskysoftware/htmx/issues/1198#issuecomment-1763180864
 			// May in time be resolved by
-			html := fmt.Sprintf("<ul hx-swap-oob='beforeend:#items'><li>%s</li></ul>", randomString)
+			var b bytes.Buffer
+			//html := fmt.Sprintf("<ul hx-swap-oob='beforeend:#items'><li>%s</li></ul>", randomString)
+			w := io.Writer(&b)
+			err := templates.ListItem(randomString).Render(c.Request().Context(), w)
+			if err != nil {
+				c.Logger().Error("failed to template ListItem")
+			}
+			html := b.String()
 
-			err := websocket.Message.Send(ws, html)
+			err = websocket.Message.Send(ws, html)
 			if err != nil {
 				if errors.Is(err, syscall.EPIPE) {
 					c.Logger().Error("connection broken")
@@ -64,7 +75,9 @@ func main() {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
 
-	e.Static("/", "./templates")
+	e.GET("/", func(c echo.Context) error {
+		return templates.Index().Render(c.Request().Context(), c.Response().Writer)
+	})
 	e.GET("/ws", hello)
 
 	e.Logger.Fatal(e.Start(":1323"))

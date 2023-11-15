@@ -1,9 +1,11 @@
+package templates
 
+templ Index() {
 <!doctype html>
 <html lang="en">
 
 <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8"/>
     <title>WebSocket</title>
     <script src="https://unpkg.com/htmx.org@1.9.8" integrity="sha384-rgjA7mptc2ETQqXoYC3/zJvkU7K/aP44Y+z7xQuJiVnB/422P/Ak+F/AqFR7E4Wr" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/htmx.org/dist/ext/ws.js"></script>
@@ -21,10 +23,11 @@
     </ul>
 
     <form id="form" ws-send>
-        <input name="chat_message">
+        <input name="chat_message"/>
     </form>
 </div>
 
 </body>
 
 </html>
+}
