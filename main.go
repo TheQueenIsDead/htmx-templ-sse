@@ -55,6 +55,10 @@ import (
 	"time"
 )
 
+var (
+	messages []string
+)
+
 func hello(c echo.Context) error {
 
 	websocket.Handler(func(ws *websocket.Conn) {
@@ -63,9 +67,16 @@ func hello(c echo.Context) error {
 
 			// Write
 			randomString := random.String(10)
-			html := fmt.Sprintf("<li id='items' hx-swap-oob='beforeend'> %s </li>", randomString)
-			//html := fmt.Sprintf("<li id=\"item\" > %s! </li>", randomString)
-			//html = html2.EscapeString(html)
+
+			messages = append(messages, randomString)
+
+			html := "<ul id='items' hx-swap-oob='true'>"
+			for _, str := range messages {
+				html = html + fmt.Sprintf("<li>%s</li>", str)
+			}
+			html += "</ul>"
+			//html :=
+
 			err := websocket.Message.Send(ws, html)
 			if err != nil {
 				if errors.Is(err, syscall.EPIPE) {
