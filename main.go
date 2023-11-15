@@ -63,7 +63,10 @@ func hello(c echo.Context) error {
 
 			// Write
 			randomString := random.String(10)
-			err := websocket.Message.Send(ws, fmt.Sprintf("<div id=\"notifications\" hx-swap-oob=\"afterend\" > %s! </div>", randomString))
+			html := fmt.Sprintf("<li id='items' hx-swap-oob='beforeend'> %s </li>", randomString)
+			//html := fmt.Sprintf("<li id=\"item\" > %s! </li>", randomString)
+			//html = html2.EscapeString(html)
+			err := websocket.Message.Send(ws, html)
 			if err != nil {
 				if errors.Is(err, syscall.EPIPE) {
 					c.Logger().Error("connection broken")

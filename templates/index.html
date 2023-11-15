@@ -10,16 +10,17 @@
 </head>
 
 <body>
-<p id="output"></p>
 
 <script>
-    htmx.logAll()
+    // htmx.logAll()
+    htmx.config.useTemplateFragments = true;
+
 </script>
 
 <div hx-ext="ws" ws-connect="ws://localhost:1323/ws">
-    <div id="notifications">
-        <p> New message received </p>
-    </div>
+    <ul id="items">
+<!--        <li> New message received </li>-->
+    </ul>
 
     <form id="form" ws-send>
         <input name="chat_message">
@@ -29,3 +30,19 @@
 </body>
 
 </html>
+
+
+<script>
+    uri = 'ws://localhost:1323/ws'
+
+    ws = new WebSocket(uri)
+
+    ws.onopen = function() {
+        console.log('Connected')
+    }
+
+    ws.onmessage = function(evt) {
+        console.log(evt.data)
+    }
+
+</script>
