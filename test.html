@@ -1,42 +1,36 @@
-package templates
-
-templ Index() {
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="utf-8"/>
-    <title>WebSocket</title>
-    <script src="https://unpkg.com/htmx.org@1.9.8" integrity="sha384-rgjA7mptc2ETQqXoYC3/zJvkU7K/aP44Y+z7xQuJiVnB/422P/Ak+F/AqFR7E4Wr" crossorigin="anonymous"></script>
-    <script src="https://unpkg.com/htmx.org/dist/ext/ws.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous"/>
+    <meta charset="UTF-8">
+    <title>Title</title>
 </head>
 
+
 <body>
-
-<script>
-    // htmx.logAll()
-    // htmx.config.useTemplateFragments = true;
-</script>
-
-<div hx-ext="ws" ws-connect="ws://localhost:1323/ws">
-
-    <ol id="items" class="list-group list-group-numbered">
-    </ol>
-
-
-    <form id="form" ws-send>
-        <input name="chat_message"/>
-    </form>
+<div class="message-container">
+    <div class="message incoming">
+        <img src="path-to-profile-pic.jpg" alt="Profile" class="profile-pic">
+        <p>Hello there!</p>
+        <span class="timestamp">3:45 PM</span>
+    </div>
+    <div class="message outgoing">
+        <p>Hi, how are you?</p>
+        <span class="timestamp">3:46 PM</span>
+    </div>
+    <!-- More messages -->
 </div>
-
+<div class="input-area">
+    <input type="text" class="input-field" placeholder="Type a message...">
+    <button class="send-button">Send</button>
+</div>
 </body>
+</html>
 
 <style>
     body {
         font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
         color: #000;
-//        background-color: #EDEFF2;
+        background-color: #EDEFF2;
     }
 
     .message-container {
@@ -92,6 +86,3 @@ templ Index() {
         color: white;
     }
 </style>
-
-</html>
-}
