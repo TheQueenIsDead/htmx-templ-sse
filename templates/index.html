@@ -1,3 +1,39 @@
+<!--<!doctype html>-->
+<!--<html lang="en">-->
+
+<!--<head>-->
+<!--    <meta charset="utf-8">-->
+<!--    <title>WebSocket</title>-->
+<!--    <script src="https://unpkg.com/htmx.org@1.9.8" integrity="sha384-rgjA7mptc2ETQqXoYC3/zJvkU7K/aP44Y+z7xQuJiVnB/422P/Ak+F/AqFR7E4Wr" crossorigin="anonymous"></script>-->
+<!--    <script src="https://unpkg.com/htmx.org/dist/ext/ws.js"></script>-->
+<!--</head>-->
+
+<!--<script>-->
+<!--    htmx.logAll()-->
+<!--</script>-->
+
+<!--<body>-->
+<!--<p id="output"></p>-->
+
+<!--&lt;!&ndash;<div hx-ext="ws" ws-connect="/ws">&ndash;&gt;-->
+<!--<div hx-ext="ws" ws-connect="ws://localhost:1323/ws">-->
+<!--    <div id="notifications" hx-swap="beforeend">-->
+<!--        <p> New message received </p>-->
+<!--    </div>-->
+
+<!--    <div id="chat_room">-->
+<!--        ...-->
+<!--    </div>-->
+<!--    <form id="form" ws-send>-->
+<!--        <input name="chat_message">-->
+<!--    </form>-->
+<!--</div>-->
+
+<!--</body>-->
+
+<!--</html>-->
+
+
 <!doctype html>
 <html lang="en">
 
@@ -10,16 +46,16 @@
 <p id="output"></p>
 
 <script>
-    // var loc = window.location;
-    // var uri = 'ws:';
-    //
-    // if (loc.protocol === 'https:') {
-    //     uri = 'wss:';
-    // }
-    // uri += '//' + loc.host;
-    // uri += loc.pathname + 'ws';
+    var loc = window.location;
+    var uri = 'ws:';
 
-    const uri = "ws://localhost:1323/ws"
+    if (loc.protocol === 'https:') {
+        uri = 'wss:';
+    }
+    uri += '//' + loc.host;
+    uri += loc.pathname + 'ws';
+
+    uri = 'ws://localhost:1323/ws'
 
     ws = new WebSocket(uri)
 
