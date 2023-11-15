@@ -9,6 +9,7 @@ templ Index() {
     <title>WebSocket</title>
     <script src="https://unpkg.com/htmx.org@1.9.8" integrity="sha384-rgjA7mptc2ETQqXoYC3/zJvkU7K/aP44Y+z7xQuJiVnB/422P/Ak+F/AqFR7E4Wr" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/htmx.org/dist/ext/ws.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous"/>
 </head>
 
 <body>
@@ -19,8 +20,10 @@ templ Index() {
 </script>
 
 <div hx-ext="ws" ws-connect="ws://localhost:1323/ws">
-    <ul id="items">
-    </ul>
+
+    <ol id="items" class="list-group list-group-numbered">
+    </ol>
+
 
     <form id="form" ws-send>
         <input name="chat_message"/>
