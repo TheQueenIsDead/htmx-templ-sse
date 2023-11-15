@@ -13,13 +13,11 @@
 
 <script>
     // htmx.logAll()
-    htmx.config.useTemplateFragments = true;
-
+    // htmx.config.useTemplateFragments = true;
 </script>
 
 <div hx-ext="ws" ws-connect="ws://localhost:1323/ws">
     <ul id="items">
-<!--        <li> New message received </li>-->
     </ul>
 
     <form id="form" ws-send>
@@ -30,19 +28,3 @@
 </body>
 
 </html>
-
-
-<script>
-    uri = 'ws://localhost:1323/ws'
-
-    ws = new WebSocket(uri)
-
-    ws.onopen = function() {
-        console.log('Connected')
-    }
-
-    ws.onmessage = function(evt) {
-        console.log(evt.data)
-    }
-
-</script>

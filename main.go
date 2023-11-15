@@ -1,46 +1,3 @@
-//package main
-//
-//import (
-//	"fmt"
-//	"github.com/labstack/echo/v4"
-//	"github.com/labstack/echo/v4/middleware"
-//	"golang.org/x/net/websocket"
-//)
-//
-//func hello(c echo.Context) error {
-//
-//	websocket.Handler(func(ws *websocket.Conn) {
-//		defer ws.Close()
-//		for {
-//			// Write
-//			err := websocket.Message.Send(ws, "Hello, Client!")
-//			if err != nil {
-//				c.Logger().Error(err)
-//				break
-//			}
-//
-//			// Read
-//			msg := ""
-//			err = websocket.Message.Receive(ws, &msg)
-//			if err != nil {
-//				c.Logger().Error(err)
-//				break
-//			}
-//			fmt.Printf("%s\n", msg)
-//		}
-//	}).ServeHTTP(c.Response(), c.Request())
-//	return nil
-//}
-//
-//func main() {
-//	e := echo.New()
-//	e.Use(middleware.Logger())
-//	e.Use(middleware.Recover())
-//	e.Static("/", "./templates")
-//	e.GET("/ws", hello)
-//	e.Logger.Fatal(e.Start(":1323"))
-//}
-
 package main
 
 import (
@@ -55,10 +12,6 @@ import (
 	"time"
 )
 
-var (
-	messages []string
-)
-
 func hello(c echo.Context) error {
 
 	websocket.Handler(func(ws *websocket.Conn) {
@@ -68,14 +21,11 @@ func hello(c echo.Context) error {
 			// Write
 			randomString := random.String(10)
 
-			messages = append(messages, randomString)
-
-			html := "<ul id='items' hx-swap-oob='true'>"
-			for _, str := range messages {
-				html = html + fmt.Sprintf("<li>%s</li>", str)
-			}
-			html += "</ul>"
-			//html :=
+			// Partial Attempt
+			// Return a list item wrapped in a list in order to mitigate interesting parsing behaviour when using OOB fragments
+			// https://github.com/bigskysoftware/htmx/issues/1198#issuecomment-1763180864
+			// May in time be resolved by
+			html := fmt.Sprintf("<ul hx-swap-oob='beforeend:#items'><li>%s</li></ul>", randomString)
 
 			err := websocket.Message.Send(ws, html)
 			if err != nil {
@@ -84,7 +34,6 @@ func hello(c echo.Context) error {
 					return
 				}
 				c.Logger().Error(err)
-				//panic(err)
 			}
 
 			//// Read
@@ -97,11 +46,10 @@ func hello(c echo.Context) error {
 			//		log.Debug("broken pipe")
 			//	}
 			//	c.Logger().Error(err)
-			//	//panic(err)
 			//}
 
 			//fmt.Printf("%s\n", msg)
-			time.Sleep(1 * time.Second)
+			time.Sleep(3 * time.Second)
 		}
 	}).ServeHTTP(c.Response(), c.Request())
 	return nil
@@ -110,7 +58,7 @@ func hello(c echo.Context) error {
 func main() {
 	e := echo.New()
 	e.Use(middleware.Logger())
-	//e.Use(middleware.Recover())
+	e.Use(middleware.Recover())
 
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
