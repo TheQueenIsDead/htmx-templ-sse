@@ -14,6 +14,8 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"sync"
+	"time"
 )
 
 var upgrader = websocket.Upgrader{
@@ -22,48 +24,62 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-func wsHandler(w http.ResponseWriter, r *http.Request) {
-	// Upgrade HTTP connection to WebSocket
-	conn, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		log.Println("Error upgrading to WebSocket:", err)
-		return
-	}
-	defer conn.Close()
+func wsReadHandler(wg sync.WaitGroup, ws *websocket.Conn) error {
+	defer wg.Done()
 
 	// Handle WebSocket messages
 	for {
 		fmt.Println("Handling")
 		// Read message from the client
-		_, msg, err := conn.ReadMessage()
+		_, msg, err := ws.ReadMessage()
 		if err != nil {
 			log.Println("Error reading message:", err)
-			break
+			return err
 		}
 
 		// Print received message
 		log.Printf("Received: %s\n", msg)
+	}
+}
+func wsWriteHandler(wg sync.WaitGroup, ws *websocket.Conn) error {
+	defer wg.Done()
 
+	for {
+		// Write a new server message back to the user
 		randomString := fmt.Sprintf("Server says: %s", random.String(10))
 		var b bytes.Buffer
 		w := io.Writer(&b)
-
-		// Write received msg back to user
-		err = templates.ListItem(fmt.Sprintf("You said: %s", msg)).Render(context.Background(), w)
-		err = conn.WriteMessage(websocket.TextMessage, b.Bytes())
+		err := templates.ListItem(fmt.Sprintf(randomString)).Render(context.Background(), w)
+		err = ws.WriteMessage(websocket.TextMessage, b.Bytes())
 		if err != nil {
-			return
+			wg.Done()
+			return err
 		}
-
-		// Write a new server message back to the user
-		b.Reset()
-		err = templates.ListItem(fmt.Sprintf(randomString)).Render(context.Background(), w)
-		err = conn.WriteMessage(websocket.TextMessage, b.Bytes())
-		if err != nil {
-			return
-		}
-
+		time.Sleep(3 * time.Second)
 	}
+}
+
+func wsHandler(c echo.Context) error {
+
+	var w http.ResponseWriter
+	var r *http.Request
+	w, r = c.Response(), c.Request()
+
+	// Upgrade HTTP connection to WebSocket
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Println("Error upgrading to WebSocket:", err)
+		return err
+	}
+	defer conn.Close()
+
+	wg := sync.WaitGroup{}
+	wg.Add(2)
+	go wsWriteHandler(wg, conn)
+	go wsReadHandler(wg, conn)
+	wg.Wait()
+
+	return nil
 }
 
 func main() {
@@ -77,10 +93,7 @@ func main() {
 	})
 
 	// WebSocket endpoint
-	e.GET("/ws", func(c echo.Context) error {
-		wsHandler(c.Response(), c.Request())
-		return nil
-	})
+	e.GET("/ws", wsHandler)
 
 	e.Logger.Fatal(e.Start(":1323"))
 }
