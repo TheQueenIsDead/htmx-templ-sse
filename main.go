@@ -58,7 +58,13 @@ func wsReadHandler(logger echo.Logger, wg sync.WaitGroup, ws *websocket.Conn, ms
 		// Print received message
 		logger.Debug(fmt.Sprintf("received: %s", msg.ChatMessage))
 		logger.Debug("adding read message to write channel")
-		msgChan <- msg.ChatMessage
+		var b bytes.Buffer
+		w := io.Writer(&b)
+		err = templates.OutgoingMessage(fmt.Sprintf("You said: %s", msg.ChatMessage)).Render(context.Background(), w)
+		if err != nil {
+			logger.Error(err)
+		}
+		msgChan <- b.String()
 		logger.Debug("read message placed on write channel")
 
 	}
@@ -68,26 +74,25 @@ func wsWriteHandler(logger echo.Logger, wg sync.WaitGroup, ws *websocket.Conn, m
 	logger.Debug("handling write operations for websocket")
 	defer wg.Done()
 
-	serverMessageChan := make(chan string)
 	go func() {
 		for {
 			// Write a new server message back to the user
 			randomString := fmt.Sprintf("Server says: %s", random.String(10))
 			var b bytes.Buffer
 			w := io.Writer(&b)
-			err = templates.ListItem(fmt.Sprintf(randomString)).Render(context.Background(), w)
+			err = templates.IncomingMessage(fmt.Sprintf(randomString)).Render(context.Background(), w)
 			if err != nil {
 				logger.Error(err)
 			}
 			logger.Debug(fmt.Sprintf("adding server message to channel: %s", randomString))
-			serverMessageChan <- b.String()
+			msgChan <- b.String()
 			time.Sleep(3 * time.Second)
 		}
 	}()
 
 	for {
 		select {
-		case serverMessage := <-serverMessageChan:
+		case serverMessage := <-msgChan:
 			logger.Debug(fmt.Sprintf("attempting to send server message: %s", serverMessage))
 			err = ws.WriteMessage(websocket.TextMessage, []byte(serverMessage))
 			if err != nil {
@@ -118,7 +123,7 @@ func wsHandler(c echo.Context) error {
 	}
 	defer conn.Close()
 
-	msgChan := make(chan string, 1)
+	msgChan := make(chan string)
 
 	wg := sync.WaitGroup{}
 	wg.Add(2)

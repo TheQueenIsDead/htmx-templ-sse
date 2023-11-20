@@ -1,5 +1,5 @@
 package templates
 
-templ ListItem(contents string) {
+templ IncomingMessage(contents string) {
 <ol class="list-group list-group-numbered" hx-swap-oob='beforeend:#items'><li class="message incoming">{contents}</li></ol>
 }
