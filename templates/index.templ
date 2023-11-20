@@ -26,9 +26,11 @@ templ Index() {
 
 
 //    <form id="form" hx-on:click="htmx.find('#items').appendChild(document.createElement('p'))" ws-send>
-    <form id="form" ws-send>
-        <input name="chat_message"/>
-    </form>
+
+<form class="input-area" ws-send>
+    <input name="chat_message" type="text" class="input-field" placeholder="Type a message..."/>
+    <button class="send-button">Send</button>
+</form>
 
 </div>
 
