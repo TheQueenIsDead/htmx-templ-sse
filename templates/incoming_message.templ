@@ -1,5 +1,8 @@
 package templates
 
 templ IncomingMessage(contents string) {
-<ol class="list-group list-group-numbered" hx-swap-oob='beforeend:#items'><li class="message incoming">{contents}</li></ol>
+//<ol class="list-group list-group-numbered" hx-swap-oob="beforeend:#items" hx-on:htmx:after-settle="scrollNavbar()">
+<ol class="list-group list-group-numbered" hx-swap-oob="beforeend:#items scroll:#items:bottom">
+  <li class="message incoming" >{contents}</li>
+</ol>
 }

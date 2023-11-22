@@ -1,5 +1,7 @@
 package templates
 
 templ OutgoingMessage(contents string) {
-<ol class="list-group list-group-numbered" hx-swap-oob='beforeend:#items'><li class="message outgoing">{contents}</li></ol>
+<ol class="list-group list-group-numbered" hx-swap-oob="beforeend:#items"  hx-swap="scroll:bottom">
+  <li class="message outgoing" >{contents}</li>
+</ol>
 }

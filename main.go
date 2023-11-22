@@ -64,6 +64,13 @@ func wsReadHandler(logger echo.Logger, wg sync.WaitGroup, ws *websocket.Conn, ms
 		if err != nil {
 			logger.Error(err)
 		}
+
+		// Attempt to reset the input area via response
+		err = templates.InputArea().Render(context.Background(), w)
+		if err != nil {
+			logger.Error(err)
+		}
+
 		msgChan <- b.String()
 		logger.Debug("read message placed on write channel")
 
@@ -80,13 +87,15 @@ func wsWriteHandler(logger echo.Logger, wg sync.WaitGroup, ws *websocket.Conn, m
 			randomString := fmt.Sprintf("Server says: %s", random.String(10))
 			var b bytes.Buffer
 			w := io.Writer(&b)
+
 			err = templates.IncomingMessage(fmt.Sprintf(randomString)).Render(context.Background(), w)
 			if err != nil {
 				logger.Error(err)
 			}
-			logger.Debug(fmt.Sprintf("adding server message to channel: %s", randomString))
+
+			logger.Debug(fmt.Sprintf("adding server message to channel: %s", b.String()))
 			msgChan <- b.String()
-			time.Sleep(3 * time.Second)
+			time.Sleep(1 * time.Second)
 		}
 	}()
 
