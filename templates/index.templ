@@ -16,13 +16,18 @@ templ Index() {
 <body>
 
 <script>
-    // htmx.logAll()
+    htmx.logAll()
     // htmx.config.useTemplateFragments = true;
 </script>
 
-<div hx-ext="sse" sse-connect="/sse" sse-swap="message" hx-target="#items" hx-swap="beforeend scroll:bottom">
+<div>
 
-    <ol id="items" class="list-group list-group-numbered">
+    <ol id="items"
+        class="list-group list-group-numbered"
+        hx-ext="sse"
+        sse-connect="/sse"
+        sse-swap="message"
+        hx-swap="beforeend scroll:#items:bottom">
     </ol>
 
     <form class="input-area" hx-post="/message">
@@ -34,65 +39,96 @@ templ Index() {
 
 </body>
 
+<script>
+document.getElementById('items').addEventListener('htmx:sseMessage', function(event) {
+    // Get the list element
+    const itemList = document.getElementById('items');
+
+    // Scroll to the bottom
+    itemList.scrollTop = itemList.scrollHeight;
+});
+</script>
+
 <style>
-    body {
-        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-        color: #000;
-//        background-color: #EDEFF2;
-    }
+//    body {
+//        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+//        color: #000;
+////        background-color: #EDEFF2;
+//    }
+//
+//    .message-container {
+//        display: flex;
+//        flex-direction: column;
+//    }
+//
+//    .message {
+//        max-width: 60%;
+//        margin-bottom: 10px;
+//        padding: 10px;
+//        border-radius: 18px;
+//        line-height: 1.4;
+//    }
+//
+//    .incoming {
+//        background-color: #ECEFF1;
+//        align-self: flex-start;
+//    }
+//
+//    .outgoing {
+//        background-color: #0084FF;
+//        align-self: flex-end;
+//        color: white;
+//    }
+//
+//    .profile-pic {
+//        width: 40px;
+//        height: 40px;
+//        border-radius: 50%;
+//        margin-right: 10px;
+//    }
+//
+//    .timestamp {
+//        font-size: 0.85em;
+//        color: #999;
+//    }
+//
+//    .input-field {
+//        background-color: white;
+//        border: none;
+//        border-radius: 18px;
+//        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+//        padding: 10px;
+//        margin: 10px;
+//    }
+//
+//    .send-button {
+//        background-color: #0084FF;
+//        border: none;
+//        border-radius: 50%;
+//        padding: 10px;
+//        color: white;
+//    }
 
-    .message-container {
-        display: flex;
-        flex-direction: column;
-    }
+//    #items {
+//        overflow:   auto;
+//        position:   relative;
+//        width:      90%;
+////        height:     100%;
+//        height:     500px;
+//    }
 
-    .message {
-        max-width: 60%;
-        margin-bottom: 10px;
-        padding: 10px;
-        border-radius: 18px;
-        line-height: 1.4;
+    #items {
+        height:200px;
+        overflow: scroll
     }
-
-    .incoming {
-        background-color: #ECEFF1;
-        align-self: flex-start;
-    }
-
-    .outgoing {
-        background-color: #0084FF;
-        align-self: flex-end;
-        color: white;
-    }
-
-    .profile-pic {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        margin-right: 10px;
-    }
-
-    .timestamp {
-        font-size: 0.85em;
-        color: #999;
-    }
-
-    .input-field {
-        background-color: white;
-        border: none;
-        border-radius: 18px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-        padding: 10px;
-        margin: 10px;
-    }
-
-    .send-button {
-        background-color: #0084FF;
-        border: none;
-        border-radius: 50%;
-        padding: 10px;
-        color: white;
-    }
+//    .message
+//    {
+////        overflow:   auto;
+////        position:   absolute;
+////        bottom:     0;
+////        max-height: 400px;
+//        width: 100%;
+//    }
 </style>
 
 </html>

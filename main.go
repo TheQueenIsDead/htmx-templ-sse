@@ -76,7 +76,7 @@ func sseHandler(c echo.Context) error {
 			}
 			c.Logger().Debug(fmt.Sprintf("adding server message to channel: %s", randomString))
 			msgChan <- b.String()
-			time.Sleep(100 * time.Millisecond)
+			time.Sleep(1 * time.Second)
 
 		}
 	}()
