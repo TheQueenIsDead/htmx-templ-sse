@@ -3,19 +3,12 @@ package main
 //go:generate templ generate templates
 
 import (
-	"bytes"
-	"context"
-	"fmt"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	log2 "github.com/labstack/gommon/log"
-	"github.com/labstack/gommon/random"
 	"htmx-temple-wss/templates"
-	"io"
-	"log"
 	"net/http"
-	"sync"
 	"time"
 )
 
@@ -36,104 +29,25 @@ type HtmxResponse struct {
 	} `json:"HEADERS"`
 }
 
-func wsReadHandler(logger echo.Logger, wg sync.WaitGroup, ws *websocket.Conn, msgChan chan string) error {
-	logger.Debug("handling read operations for websocket")
+func sseHandler(c echo.Context) error {
+	// Set headers for SSE
+	c.Response().Header().Set(echo.HeaderContentType, "text/event-stream")
+	c.Response().Header().Set("Cache-Control", "no-cache")
+	c.Response().Header().Set("Connection", "keep-alive")
 
-	defer wg.Done()
+	// Flush the headers to ensure the client receives them
+	c.Response().Flush()
 
-	// Handle WebSocket messages
-
+	// Infinite loop to keep the connection open
 	for {
-		logger.Debug("waiting to read from websocket")
-		// Read message from the client
-
-		var msg HtmxResponse
-		err := ws.ReadJSON(&msg)
-		if err != nil {
-			logger.Error("could not marshal message into htmx template")
-			logger.Error(err)
-		}
-		logger.Debug("websocket data received")
-
-		// Print received message
-		logger.Debug(fmt.Sprintf("received: %s", msg.ChatMessage))
-		logger.Debug("adding read message to write channel")
-		var b bytes.Buffer
-		w := io.Writer(&b)
-		err = templates.OutgoingMessage(fmt.Sprintf("You said: %s", msg.ChatMessage)).Render(context.Background(), w)
-		if err != nil {
-			logger.Error(err)
-		}
-		msgChan <- b.String()
-		logger.Debug("read message placed on write channel")
-
+		// Simulate some data to send to the client
+		data := "Hello, SSE!"
+		// Send data to the client
+		c.Response().Write([]byte("data: " + data + "\n\n"))
+		c.Response().Flush()
+		// Introduce a delay (you can replace this with real-time updates)
+		<-time.After(1 * time.Second)
 	}
-}
-func wsWriteHandler(logger echo.Logger, wg sync.WaitGroup, ws *websocket.Conn, msgChan chan string) (err error) {
-
-	logger.Debug("handling write operations for websocket")
-	defer wg.Done()
-
-	go func() {
-		for {
-			// Write a new server message back to the user
-			randomString := fmt.Sprintf("Server says: %s", random.String(10))
-			var b bytes.Buffer
-			w := io.Writer(&b)
-			err = templates.IncomingMessage(fmt.Sprintf(randomString)).Render(context.Background(), w)
-			if err != nil {
-				logger.Error(err)
-			}
-			logger.Debug(fmt.Sprintf("adding server message to channel: %s", randomString))
-			msgChan <- b.String()
-			time.Sleep(3 * time.Second)
-		}
-	}()
-
-	for {
-		select {
-		case serverMessage := <-msgChan:
-			logger.Debug(fmt.Sprintf("attempting to send server message: %s", serverMessage))
-			err = ws.WriteMessage(websocket.TextMessage, []byte(serverMessage))
-			if err != nil {
-				logger.Error("error writing message to websocket")
-				logger.Error(err)
-				wg.Done()
-				return
-			}
-		}
-	}
-	logger.Debug("broken out of handling write operations for websocket")
-	return nil
-}
-
-func wsHandler(c echo.Context) error {
-
-	c.Logger().Debug("handling incoming webhook request")
-
-	var w http.ResponseWriter
-	var r *http.Request
-	w, r = c.Response(), c.Request()
-
-	// Upgrade HTTP connection to WebSocket
-	conn, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		log.Println("Error upgrading to WebSocket:", err)
-		return err
-	}
-	defer conn.Close()
-
-	msgChan := make(chan string)
-
-	wg := sync.WaitGroup{}
-	wg.Add(2)
-	go wsWriteHandler(c.Logger(), wg, conn, msgChan)
-	go wsReadHandler(c.Logger(), wg, conn, msgChan)
-	c.Logger().Debug("waiting on websocket r/w goroutines to complete")
-	wg.Wait()
-	c.Logger().Debug("websocket r/w goroutines completed")
-
-	return nil
 }
 
 func main() {
@@ -149,7 +63,10 @@ func main() {
 	})
 
 	// WebSocket endpoint
-	e.GET("/ws", wsHandler)
+	//e.GET("/ws", wsHandler)
+
+	// sseHandler
+	e.GET("/sse", sseHandler)
 
 	e.Logger.Fatal(e.Start(":1323"))
 }
