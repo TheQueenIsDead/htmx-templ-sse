@@ -35,7 +35,7 @@ type HtmxResponse struct {
 }
 
 type Message struct {
-	ChatMessage string `query:"chat_message"`
+	ChatMessage string `form:"chat_message"`
 }
 
 var (
@@ -50,8 +50,18 @@ func messageHandler(c echo.Context) error {
 		return c.String(http.StatusBadRequest, "bad request")
 	}
 
+	// Write a new server message back to the user
+	var b bytes.Buffer
+	w := io.Writer(&b)
+	err = templates.OutgoingMessage(fmt.Sprintf("You said: %s", message.ChatMessage)).Render(context.Background(), w)
+	if err != nil {
+		c.Logger().Error(err)
+	}
+	c.Logger().Debug(fmt.Sprintf("adding server message to channel: %s", fmt.Sprintf("You said: %s", message.ChatMessage)))
+	msgChan <- b.String()
+
 	// TODO: Actually return something
-	return nil
+	return c.NoContent(200)
 }
 
 func sseHandler(c echo.Context) error {
@@ -76,7 +86,7 @@ func sseHandler(c echo.Context) error {
 			}
 			c.Logger().Debug(fmt.Sprintf("adding server message to channel: %s", randomString))
 			msgChan <- b.String()
-			time.Sleep(1 * time.Second)
+			time.Sleep(10 * time.Second)
 
 		}
 	}()
@@ -122,9 +132,7 @@ func main() {
 	})
 
 	// Message Creation
-	e.POST("/message", func(c echo.Context) error {
-		return templates.Index().Render(c.Request().Context(), c.Response().Writer)
-	})
+	e.POST("/message", messageHandler)
 
 	// Server Sent Events
 	e.GET("/sse", sseHandler)

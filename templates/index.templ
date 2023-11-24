@@ -30,7 +30,7 @@ templ Index() {
         hx-swap="beforeend scroll:#items:bottom">
     </ol>
 
-    <form class="input-area" hx-post="/message">
+    <form class="input-area" hx-post="/message" hx-swap="none">
         <input name="chat_message" type="text" class="input-field" placeholder="Type a message..."/>
         <button class="send-button">Send</button>
     </form>
@@ -50,85 +50,82 @@ document.getElementById('items').addEventListener('htmx:sseMessage', function(ev
 </script>
 
 <style>
-//    body {
-//        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-//        color: #000;
-////        background-color: #EDEFF2;
-//    }
-//
-//    .message-container {
-//        display: flex;
-//        flex-direction: column;
-//    }
-//
-//    .message {
-//        max-width: 60%;
-//        margin-bottom: 10px;
-//        padding: 10px;
-//        border-radius: 18px;
-//        line-height: 1.4;
-//    }
-//
-//    .incoming {
-//        background-color: #ECEFF1;
-//        align-self: flex-start;
-//    }
-//
-//    .outgoing {
-//        background-color: #0084FF;
-//        align-self: flex-end;
-//        color: white;
-//    }
-//
-//    .profile-pic {
-//        width: 40px;
-//        height: 40px;
-//        border-radius: 50%;
-//        margin-right: 10px;
-//    }
-//
-//    .timestamp {
-//        font-size: 0.85em;
-//        color: #999;
-//    }
-//
-//    .input-field {
-//        background-color: white;
-//        border: none;
-//        border-radius: 18px;
-//        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-//        padding: 10px;
-//        margin: 10px;
-//    }
-//
-//    .send-button {
-//        background-color: #0084FF;
-//        border: none;
-//        border-radius: 50%;
-//        padding: 10px;
-//        color: white;
-//    }
+    body {
+        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        color: #000;
+//        background-color: #EDEFF2;
+    }
 
-//    #items {
-//        overflow:   auto;
-//        position:   relative;
-//        width:      90%;
-////        height:     100%;
-//        height:     500px;
-//    }
+    .message-container {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .message {
+        max-width: 60%;
+        margin-bottom: 10px;
+        padding: 10px;
+        border-radius: 18px;
+        line-height: 1.4;
+    }
+
+    .incoming {
+        background-color: #ECEFF1;
+        align-self: flex-start;
+    }
+
+    .outgoing {
+        background-color: #0084FF;
+        align-self: flex-end;
+        color: white;
+    }
+
+    .profile-pic {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin-right: 10px;
+    }
+
+    .timestamp {
+        font-size: 0.85em;
+        color: #999;
+    }
+
+    .input-field {
+        background-color: white;
+        border: none;
+        border-radius: 18px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        padding: 10px;
+        margin: 10px;
+    }
+
+    .send-button {
+        background-color: #0084FF;
+        border: none;
+        border-radius: 50%;
+        padding: 10px;
+        color: white;
+    }
 
     #items {
-        height:200px;
-        overflow: scroll
+        overflow:   auto;
+        position:   relative;
+        width:      90%;
+//        height:     100%;
+        height:     500px;
     }
-//    .message
-//    {
-////        overflow:   auto;
-////        position:   absolute;
-////        bottom:     0;
-////        max-height: 400px;
-//        width: 100%;
-//    }
+
+
+    .message
+    {
+//        overflow:   auto;
+//        position:   absolute;
+//        bottom:     0;
+//        max-height: 400px;
+        width: 100%;
+    }
 </style>
 
 </html>
