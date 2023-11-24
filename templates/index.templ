@@ -20,18 +20,15 @@ templ Index() {
     // htmx.config.useTemplateFragments = true;
 </script>
 
-<div hx-ext="ws" ws-connect="ws://localhost:1323/ws">
+<div hx-ext="sse" sse-connect="/sse" sse-swap="message" hx-target="#items" hx-swap="beforeend scroll:bottom">
 
     <ol id="items" class="list-group list-group-numbered">
     </ol>
 
-
-//    <form id="form" hx-on:click="htmx.find('#items').appendChild(document.createElement('p'))" ws-send>
-
-<form class="input-area" ws-send>
-    <input name="chat_message" type="text" class="input-field" placeholder="Type a message..."/>
-    <button class="send-button">Send</button>
-</form>
+    <form class="input-area" hx-post="/message">
+        <input name="chat_message" type="text" class="input-field" placeholder="Type a message..."/>
+        <button class="send-button">Send</button>
+    </form>
 
 </div>
 
