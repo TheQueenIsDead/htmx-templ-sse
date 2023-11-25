@@ -22,12 +22,15 @@ templ Index() {
 
 <div>
 
+    // The chatroom remains showing the latest item using the after-settle workaround because swap events are not
+    // shared with extensions by default: https://github.com/bigskysoftware/htmx/issues/784#issuecomment-1751965125
     <ol id="items"
         class="list-group list-group-numbered"
         hx-ext="sse"
         sse-connect="/sse"
         sse-swap="message"
-        hx-swap="beforeend scroll:#items:bottom">
+        hx-swap="beforeend"
+        hx-on::after-settle="this.scrollTo(0, this.scrollHeight);">
     </ol>
 
     <form class="input-area" hx-post="/message" hx-swap="none">
@@ -39,15 +42,6 @@ templ Index() {
 
 </body>
 
-<script>
-document.getElementById('items').addEventListener('htmx:sseMessage', function(event) {
-    // Get the list element
-    const itemList = document.getElementById('items');
-
-    // Scroll to the bottom
-    itemList.scrollTop = itemList.scrollHeight;
-});
-</script>
 
 <style>
     body {

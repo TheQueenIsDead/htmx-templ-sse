@@ -6,7 +6,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/labstack/gommon/log"
@@ -16,23 +15,6 @@ import (
 	"net/http"
 	"time"
 )
-
-var upgrader = websocket.Upgrader{
-	CheckOrigin: func(r *http.Request) bool {
-		return true
-	},
-}
-
-type HtmxResponse struct {
-	ChatMessage string `json:"chat_message"`
-	HEADERS     struct {
-		HXRequest     string      `json:"HX-Request"`
-		HXTrigger     string      `json:"HX-Trigger"`
-		HXTriggerName interface{} `json:"HX-Trigger-Name"`
-		HXTarget      string      `json:"HX-Target"`
-		HXCurrentURL  string      `json:"HX-Current-URL"`
-	} `json:"HEADERS"`
-}
 
 type Message struct {
 	ChatMessage string `form:"chat_message"`
@@ -60,7 +42,6 @@ func messageHandler(c echo.Context) error {
 	c.Logger().Debug(fmt.Sprintf("adding server message to channel: %s", fmt.Sprintf("You said: %s", message.ChatMessage)))
 	msgChan <- b.String()
 
-	// TODO: Actually return something
 	return c.NoContent(200)
 }
 
@@ -86,7 +67,7 @@ func sseHandler(c echo.Context) error {
 			}
 			c.Logger().Debug(fmt.Sprintf("adding server message to channel: %s", randomString))
 			msgChan <- b.String()
-			time.Sleep(10 * time.Second)
+			time.Sleep(1 * time.Second)
 
 		}
 	}()
